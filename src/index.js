@@ -1,8 +1,8 @@
 console.log('%c HI', 'color: firebrick')
 
-let dogBreeds = []
 const breedList = document.getElementById("dog-breeds")
 const filterDropdown = document.getElementById('breed-dropdown')
+let dogBreeds = []
 
 function fetchImages() {
     fetch('https://dog.ceo/api/breeds/image/random/4') 
@@ -13,7 +13,7 @@ function fetchImages() {
 function fetchBreeds() {
     fetch('https://dog.ceo/api/breeds/list/all') 
     .then(response => response.json()) 
-    .then(json => renderBreeds(json.message))
+    .then(json => initializeBreeds(json.message))
 }
 
 function renderImages(images) {
@@ -26,26 +26,34 @@ function renderImages(images) {
     })
 }
 
-function renderFilteredBreed(letter){
-    dogBreeds.filter(breed => breed.startsWith(letter)).forEach(function(breed){
+function filterBreeds(letter){
+    dogBreeds.filter(breed => breed.startsWith(letter)).forEach(breed => {
         const liTag = document.createElement('li')
         liTag.innerHTML = breed
         liTag.addEventListener('click', function(e){
-            e.target.style = `color: rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255});`
+            e.target.style = `color: rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255});`
         })
         breedList.appendChild(liTag)
     })
 }
 
-function renderBreeds(breeds){
-    dogBreeds = Object.keys(breeds)
-    renderFilteredBreed('a')
+function initializeBreeds(breeds){
+    Object.keys(breeds).forEach(breed => {
+        if(breeds[breed].length > 0){
+            breeds[breed].forEach(subBreed => {
+                dogBreeds.push(`${subBreed} ${breed}`)
+            })
+        } else {
+            dogBreeds.push(breed)
+        }
+    })
+    filterBreeds('a')
 }
 
 filterDropdown.addEventListener('change', function(e){
     breedList.innerHTML = ''
     filterLetter = e.target.value
-    renderFilteredBreed(filterLetter)
+    filterBreeds(filterLetter)
 })
 
 fetchImages()
